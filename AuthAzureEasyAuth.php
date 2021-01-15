@@ -10,6 +10,7 @@ class AuthAzureEasyAuth extends MediaWiki\Session\ImmutableSessionProviderWithCo
 {
     //TODO: Single Sign Out - endsession endpoint by checking if action=AuthAzureEasyAuth-EndSession
     private $principal = null;
+    
     /**
      * @param array $params Keys include:
      *  - priority: (required) Set the priority
@@ -72,7 +73,7 @@ class AuthAzureEasyAuth extends MediaWiki\Session\ImmutableSessionProviderWithCo
         global $wgAuthAzureEasyAuthIssuers;
         
         $issuer = $this->getClaim("iss");
-        if (in_array($issuer, $wgAuthAzureEasyAuthIssuers) == false) {
+        if (!in_array($issuer, $wgAuthAzureEasyAuthIssuers, true)) {
             echo "You are not allowed to access this site with account [ $username ]. Issuer was [ $issuer ].";
             die;
         }
