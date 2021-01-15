@@ -3,7 +3,7 @@ use MediaWiki\Session\SessionInfo;
 use MediaWiki\Session\UserInfo;
 
 global $wgHooks;
-$wgHooks["UserLogoutComplete"][] = "casLogout";
+$wgHooks["UserLogout"  ][] = "AuthAzureEasyAuth::onUserLogout";
 
 class AuthAzureEasyAuth extends MediaWiki\Session\ImmutableSessionProviderWithCookie
 {
@@ -152,27 +152,12 @@ class AuthAzureEasyAuth extends MediaWiki\Session\ImmutableSessionProviderWithCo
         return true;
     }
 
-    public static function Logout()
+    // Inspired by https://www.mediawiki.org/wiki/Extension:RedirectAfterLogout
+    public static function onUserLogout(&$user)
     {
-        global $wgUser;
-        global $wgRequest;
-        $wgUser->doLogout();
-    
-        // Get returnto value
-        $redirectUrl = null;
-        $returnto = $wgRequest->getVal("returnto");
-        if ($returnto) {
-            $target = Title::newFromText($returnto);
-            if ($target) {
-                $redirectUrl = $target->getFullUrl();
-            }
-        }
-    
-        if (isset($redirectUrl)) {
-            header("Location: /.auth/logout?post_logout_redirect_uri=$redirectUrl");
-        } else {
-            header("Location: /.auth/logout");
-        }
-        exit;
+        global $wgOut;
+        $wgOut->redirect( "/.auth/logout" );
+        
+        return true;
     }
 }
