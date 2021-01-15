@@ -3,6 +3,7 @@ use MediaWiki\Session\SessionInfo;
 use MediaWiki\Session\UserInfo;
 
 global $wgHooks;
+$wgHooks["PersonalUrls"][] = "AuthAzureEasyAuth::NoLoginLinkOnMainPage";
 $wgHooks["UserLogout"  ][] = "AuthAzureEasyAuth::onUserLogout";
 
 class AuthAzureEasyAuth extends MediaWiki\Session\ImmutableSessionProviderWithCookie
@@ -149,6 +150,15 @@ class AuthAzureEasyAuth extends MediaWiki\Session\ImmutableSessionProviderWithCo
 
     public function canChangeUser()
     {
+        return true;
+    }
+
+    // Removing the Login link from all pages
+    // https://www.mediawiki.org/wiki/Manual:Preventing_access#Removing_the_Login_link_from_all_pages
+    public static function NoLoginLinkOnMainPage(&$personal_urls)
+    {
+        unset( $personal_urls['login'] );
+        unset( $personal_urls['anonlogin'] );
         return true;
     }
 
