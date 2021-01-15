@@ -68,10 +68,10 @@ class AuthAzureEasyAuth extends MediaWiki\Session\ImmutableSessionProviderWithCo
      */
     protected function newSessionForRequest($username, WebRequest $request)
     {
-        global $wgAuthRemoteuserIssuers;
+        global $wgAuthAzureEasyAuthIssuers;
         
         $issuer = $this->getClaim("iss");
-        if (in_array($issuer, $wgAuthRemoteuserIssuers) == false) {
+        if (in_array($issuer, $wgAuthAzureEasyAuthIssuers) == false) {
             echo "You are not allowed to access this site with account [ $username ]. Issuer was [ $issuer ].";
             die;
         }
