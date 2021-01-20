@@ -40,6 +40,8 @@ class AuthAzureEasyAuth extends MediaWiki\Session\ImmutableSessionProviderWithCo
     
     public function provideSessionInfo(WebRequest $request)
     {
+        $this->denyNonWhitelistedTenants();
+
         $id = $this->getSessionIdFromCookie($request);
         
         if ((null === $id)||(!MediaWiki\Session\SessionManager::singleton()->getSessionById($id))) {
@@ -70,14 +72,6 @@ class AuthAzureEasyAuth extends MediaWiki\Session\ImmutableSessionProviderWithCo
      */
     protected function newSessionForRequest($username, WebRequest $request)
     {
-        global $wgAuthAzureEasyAuthIssuers;
-        
-        $issuer = $this->getClaim("iss");
-        if (!in_array($issuer, $wgAuthAzureEasyAuthIssuers, true)) {
-            echo "You are not allowed to access this site with account [ $username ]. Issuer was [ $issuer ].";
-            die;
-        }
-
         $id = $this->getSessionIdFromCookie($request);
 
         $user = User::newFromName($username, 'usable');
@@ -125,6 +119,16 @@ class AuthAzureEasyAuth extends MediaWiki\Session\ImmutableSessionProviderWithCo
         $user->saveSettings();
     }
 
+    private function denyNonWhitelistedTenants() {
+        global $wgAuthAzureEasyAuthIssuers;
+        
+        $issuer = $this->getClaim("iss");
+        if (!in_array($issuer, $wgAuthAzureEasyAuthIssuers, true)) {
+            echo "You are not allowed to access this site with account [ $username ]. Issuer was [ $issuer ].";
+            die;
+        }
+    }
+
     private function getClaim($claimName)
     {
         $value = null;
@@ -154,8 +158,10 @@ class AuthAzureEasyAuth extends MediaWiki\Session\ImmutableSessionProviderWithCo
         return true;
     }
 
-    // Removing the Login link from all pages
-    // https://www.mediawiki.org/wiki/Manual:Preventing_access#Removing_the_Login_link_from_all_pages
+    /**
+     * Removes the Login link from all pages.
+     * https://www.mediawiki.org/wiki/Manual:Preventing_access#Removing_the_Login_link_from_all_pages
+     */
     public static function NoLoginLinkOnMainPage(&$personal_urls)
     {
         unset( $personal_urls['login'] );
