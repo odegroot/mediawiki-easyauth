@@ -124,6 +124,7 @@ class AuthAzureEasyAuth extends MediaWiki\Session\ImmutableSessionProviderWithCo
         
         $issuer = $this->getClaim("iss");
         if (!in_array($issuer, $wgAuthAzureEasyAuthIssuers, true)) {
+            $username = $this->getUpn();
             echo "You are not allowed to access this site with account [ $username ]. Issuer was [ $issuer ].";
             die;
         }
